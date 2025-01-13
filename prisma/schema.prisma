@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+
+  google_id    String? @unique // OAuth2
+  microsoft_id String? @unique // OAuth2
+  email        String  @unique
+  name         String
+  wiki_name    String? @unique
+
+  has_mandate Boolean @default(false)
+  is_admin    Boolean @default(false)
+  is_active   Boolean @default(false)
+
+  authored_proposals    Proposal[] @relation("authored_proposals")
+  owned_propposals      Proposal[] @relation("owned_proposals")
+  implemented_proposals Proposal[] @relation("implemented_proposals")
+}
+
+enum ProposalType {
+  Offline
+  OnlineSingleChoice
+  OnlineMultiChoice
+}
+
+model Proposal {
+  id Int @id @default(autoincrement())
+
+  title String
+
+  author_id Int
+  author    User @relation(name: "authored_proposals", fields: [author_id], references: [id]) // TODO: Should we keep the proposals of users who have been deleted? If yes, the author should be nullable.
+
+  proposer_id Int
+  proposer    User @relation(name: "owned_proposals", fields: [proposer_id], references: [id])
+
+  implementer_id Int
+  implementer    User @relation(name: "implemented_proposals", fields: [implementer_id], references: [id])
+
+  proposition_date DateTime @default(now())
+  agenda_date      DateTime @default(now())
+
+  content             String
+  table               String? // Optional
+  proposed_resolution String  @default("Javaslom, hogy a VIK HK fogadja el az előterjesztést.")
+
+  attachments        Attachment[]
+  previous_proposals String
+
+  yes_votes        Int
+  no_votes         Int
+  abstention_votes Int
+  invalid_votes    Int
+
+  is_accepted        Boolean
+  is_urgent          Boolean
+  is_electronic      Boolean
+  is_double_majority Boolean
+  is_hidden          Boolean
+}
+
+model Attachment {
+  id          Int      @id @default(autoincrement())
+
+  proposal_id Int
+  proposal    Proposal @relation(fields: [proposal_id], references: [id])
+  
+  file_path   String
+  file_name   String
+  is_hidden   Boolean
+}
+
+// model BeszamoloGroup {
+//   id             Int              @id @default(autoincrement())
+//   first_day      Int
+//   last_day       Int
+//   year           Int
+//   month          Int
+//   path           String
+//   hidden         Int
+//   BeszamoloMoney BeszamoloMoney[]
+// }
+
+// model BeszamoloMoney {
+//   id                 Int            @id @default(autoincrement())
+//   wiki_name          String
+//   money              Int
+//   point              Int
+//   beszamolo_group_id Int
+//   BeszamoloGroup     BeszamoloGroup @relation(fields: [beszamolo_group_id], references: [id])
+// }
+
+// model Vote {
+//   id               Int             @id @default(autoincrement())
+//   available_date   String
+//   end_date         String
+//   hidden           Int
+//   mandate_only     Int
+//   public_vote      Int
+//   eloterjesztes_id Int
+//   question         String
+//   created_by       Int
+//   maximum_votes    Int
+//   closed           Int
+//   one_choice_only  Int
+//   VoteCandidates   VoteCandidate[]
+//   UserVotes        UserVote[]
+//   CastedVotes      CastedVote[]
+// }
+
+// model VoteCandidate {
+//   id          Int          @id @default(autoincrement())
+//   name        String
+//   vote_id     Int
+//   Vote        Vote         @relation(fields: [vote_id], references: [id])
+//   CastedVotes CastedVote[]
+//   UserVote    UserVote[]
+// }
+
+// model UserVote {
+//   id                Int           @id @default(autoincrement())
+//   user_id           Int
+//   vote_id           Int
+//   vote_candidate_id Int
+//   Vote              Vote          @relation(fields: [vote_id], references: [id])
+//   VoteCandidate     VoteCandidate @relation(fields: [vote_candidate_id], references: [id])
+// }
+
+// model CastedVote {
+//   id                Int           @id @default(autoincrement())
+//   vote              String
+//   vote_candidate_id Int
+//   vote_id           Int
+//   casted_by         Int
+//   casted_by_hash    String
+//   Vote              Vote          @relation(fields: [vote_id], references: [id])
+//   VoteCandidate     VoteCandidate @relation(fields: [vote_candidate_id], references: [id])
+// }

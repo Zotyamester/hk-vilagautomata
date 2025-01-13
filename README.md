@@ -1,1 +1,1 @@
-# hk-vilagautomata
+# HK Világautomata
