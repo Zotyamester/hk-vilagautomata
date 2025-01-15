@@ -12,11 +12,11 @@
 		</h1>
 		<div class="col-12 col-md-4 d-md-flex justify-content-end align-items-center">
 			<div class="row mx-0">
-                <a href="/proposals/new" class="btn btn-success">
-                    <i class="fa-solid fa-plus"></i>
-                    Létrehozás
-                </a>
-            </div>
+				<a href="/proposals/new" class="btn btn-success">
+					<i class="fa-solid fa-plus"></i>
+					Létrehozás
+				</a>
+			</div>
 		</div>
 	</section>
 
@@ -100,7 +100,13 @@
 								</td>
 								<td>
 									<div class="w-100 h-100 d-flex justify-content-end align-items-center">
-										<div class="btn-group" role="group" aria-label="Műveletek">
+										<form
+											action="/proposals/{proposal.id}?/delete"
+											method="post"
+											class="btn-group"
+											role="group"
+											aria-label="Műveletek"
+										>
 											<a
 												href="/proposals/{proposal.id}"
 												class="btn btn-primary"
@@ -109,15 +115,10 @@
 											>
 												<i class="fa-solid fa-pen-to-square"></i>
 											</a>
-											<a
-												href="/proposals/{proposal.id}"
-												class="btn btn-danger"
-												role="button"
-												aria-label="Törlés"
-											>
+											<button type="submit" class="btn btn-danger" aria-label="Törlés">
 												<i class="fa-solid fa-trash"></i>
-											</a>
-										</div>
+											</button>
+										</form>
 									</div>
 								</td>
 							</tr>
