@@ -6,7 +6,7 @@ export const load = (async ({ cookies, url, locals }) => {
 	console.log(`  cookies: ${cookies.get('token')}`);
 	const user = locals.user;
 	if (!user) {
-		throw redirect(302, `/auth?redirectTo=${url.pathname}`);
+		redirect(302, `/auth?redirectTo=${url.pathname}`);
 	}
 
 	return {

@@ -43,7 +43,7 @@ export const actions = {
 				}
 			});
 		} catch {
-			throw redirect(403, "Insufficient permissions");
+			// redirect(403, "Insufficient permissions");
 		}
 	}
 } satisfies Actions;

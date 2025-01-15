@@ -6,7 +6,7 @@ import { removeAuthToken, setAuthToken } from '$lib/server/user';
 export const load = (async ({ locals, url }) => {
 	const redirectTo = url.searchParams.get('redirectTo');
 	if (locals.user) {
-		throw redirect(302, redirectTo ?? '/');
+		redirect(302, redirectTo ?? '/');
 	}
 	return {
 		redirectTo
@@ -20,11 +20,11 @@ export const actions = {
 		
 		const redirectTo = url.searchParams.get('redirectTo');
 		console.log(redirectTo);
-		throw redirect(302, redirectTo ?? '/');
+		redirect(302, redirectTo ?? '/');
 	},
 	logout: ({ cookies, locals }) => {
 		removeAuthToken(locals, cookies);
-		throw redirect(302, '/');
+		redirect(302, '/');
 	}
 } satisfies Actions;
 

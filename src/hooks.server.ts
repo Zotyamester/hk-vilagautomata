@@ -15,7 +15,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			}
 		});
 		if (!user) {
-			throw redirect(401, 'Invalid access token');
+			redirect(401, 'Invalid access token');
 		}
 
 		event.locals.user = user;
