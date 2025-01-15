@@ -4,14 +4,20 @@ import { ObjectParser } from '@pilcrowjs/object-parser';
 import { decodeIdToken } from 'arctic';
 
 import type { OAuth2Tokens } from 'arctic';
-import { createUserWithGoogle, getUserByGoogleId, setAuthToken } from '$lib/server/user';
+import {
+	createSession,
+	createUserWithGoogle,
+	generateSessionToken,
+	getUserByGoogleId,
+	setSessionTokenCookie
+} from '$lib/server/user';
 import { error } from 'console';
 
-export const GET: RequestHandler = async (event) => {
-	const storedState = event.cookies.get('google_oauth_state') ?? null;
-	const codeVerifier = event.cookies.get('google_code_verifier') ?? null;
-	const code = event.url.searchParams.get('code');
-	const state = event.url.searchParams.get('state');
+export const GET: RequestHandler = async ({ cookies, url }) => {
+	const storedState = cookies.get('google_oauth_state') ?? null;
+	const codeVerifier = cookies.get('google_code_verifier') ?? null;
+	const code = url.searchParams.get('code');
+	const state = url.searchParams.get('state');
 
 	if (storedState === null || codeVerifier === null || code === null || state === null) {
 		return new Response('Please restart the process.', {
@@ -46,12 +52,16 @@ export const GET: RequestHandler = async (event) => {
 		if (!user) {
 			throw error('Registration error');
 		}
+
 		console.log(`[DEBUG]: registration was successful`);
 	}
-	
-	await setAuthToken(user, event.cookies);
+
+	const sessionToken = generateSessionToken();
+	const session = await createSession(sessionToken, user);
+	setSessionTokenCookie(cookies, sessionToken, session.expiresAt);
+
 	console.log(`[DEBUG]: authentication with G was successful`);
-	console.log(`cookies: ${event.cookies.get('token')}`);
+
 	return new Response(null, {
 		status: 302,
 		headers: {

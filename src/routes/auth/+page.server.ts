@@ -1,13 +1,20 @@
-import { redirect, type Actions } from '@sveltejs/kit';
+import { error, redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import prisma from '$lib/prisma';
-import { removeAuthToken, setAuthToken } from '$lib/server/user';
+import {
+	createSession,
+	deleteSessionTokenCookie,
+	generateSessionToken,
+	invalidateSession,
+	setSessionTokenCookie
+} from '$lib/server/user';
 
 export const load = (async ({ locals, url }) => {
 	const redirectTo = url.searchParams.get('redirectTo');
-	if (locals.user) {
+	if (locals.session) {
 		redirect(302, redirectTo ?? '/');
 	}
+
 	return {
 		redirectTo
 	};
@@ -16,15 +23,21 @@ export const load = (async ({ locals, url }) => {
 export const actions = {
 	login: async ({ cookies, url }) => {
 		const user = await prisma.user.findFirstOrThrow(); // dummy, TODO: ...
-		await setAuthToken(user, cookies);
-		
+		const sessionToken = generateSessionToken();
+		const session = await createSession(sessionToken, user);
+		setSessionTokenCookie(cookies, sessionToken, session.expiresAt);
+
 		const redirectTo = url.searchParams.get('redirectTo');
-		console.log(redirectTo);
 		redirect(302, redirectTo ?? '/');
 	},
+
 	logout: ({ cookies, locals }) => {
-		removeAuthToken(locals, cookies);
+		if (!locals.session) {
+			error(401);
+		}
+
+		invalidateSession(locals.session.id);
+		deleteSessionTokenCookie(cookies);
 		redirect(302, '/');
 	}
 } satisfies Actions;
-

@@ -1,24 +1,19 @@
-import prisma from '$lib/prisma';
-import { verifyJWT } from '$lib/server/token';
-import { redirect, type Handle } from '@sveltejs/kit';
+import { deleteSessionTokenCookie, setSessionTokenCookie, validateSessionToken } from '$lib/server/user';
+import { type Handle } from '@sveltejs/kit';
 
-export const handle: Handle = async ({ event, resolve }) => {
-	console.log(`[DEBUG]: ${event.url.pathname}`);
+export const handle: Handle = async ({ event, resolve }) => { 
+	console.log(`[DEBUG]: ${event.url}`);
 	
-	const token = event.cookies.get('Authorization')?.split(' ')[1];
+	const token = event.cookies.get('session');
 	if (token) {
-		const { sub } = await verifyJWT<{ sub: string }>(token);
-
-		const user = await prisma.user.findUnique({
-			where: {
-				id: parseInt(sub)
-			}
-		});
-		if (!user) {
-			redirect(401, 'Invalid access token');
+		const session = await validateSessionToken(token);
+		if (session) {
+			setSessionTokenCookie(event.cookies, token, session.expiresAt);
+		} else {
+			deleteSessionTokenCookie(event.cookies);
 		}
 
-		event.locals.user = user;
+		event.locals.session = session;
 	}
 
 	return await resolve(event);
