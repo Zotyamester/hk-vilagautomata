@@ -74,22 +74,18 @@
 						</li>
 					{/each}
 				</ul>
-				<ul class="navbar-nav ms-auto">
-					{#if data.user}
-						<li><hr class="dropdown-divider" /></li>
-						<li class="nav-item">
-							<a href="/users/{data.user.id}" class="nav-link text-center text-white">{data.user.name}</a>
-						</li>
-						<li class="nav-item">
-							<form action="/auth/?/logout" method="post">
-								<button type="submit" class="btn btn-outline-secondary">Kijelentkezés</button>
-							</form>
-						</li>
-					{:else}
-						<li class="nav-item">
-							<a href="/auth" class="btn btn-outline-success">Bejelentkezés</a>
-						</li>
-					{/if}
+				<ul class="navbar-nav d-flex ms-auto">
+					<li><hr class="navbar-divider" /></li>
+					<li class="nav-item">
+						<a href="/users/{data.user.id}" class="nav-link text-center text-white">{data.user.name}</a>
+					</li>
+					<li class="nav-item align-self-center">
+						<form action="/auth/?/logout" method="post">
+							<button type="submit" class="btn btn-outline-warning btn-sm" aria-label="Kijelentkezés">
+								<i class="fa-solid fa-right-from-bracket"></i>
+							</button>
+						</form>
+					</li>
 				</ul>
 			</div>
 		</div>
