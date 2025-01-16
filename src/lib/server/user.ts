@@ -7,13 +7,15 @@ import { sha256 } from '@oslojs/crypto/sha2';
 export async function createUserWithGoogle(
 	google_id: string,
 	email: string,
-	name: string
+	name: string,
+	picture: string
 ): Promise<User | null> {
 	const user = await prisma.user.create({
 		data: {
 			google_id,
 			email,
-			name
+			name,
+			picture_url: picture
 		}
 	});
 	return user;

@@ -1,10 +1,10 @@
 <script lang="ts">
-    import type { Snippet } from 'svelte';
-    import type { LayoutData } from './$types';
+	import type { Snippet } from 'svelte';
+	import type { LayoutData } from './$types';
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 
-    let { data, children }: { data: LayoutData, children: Snippet } = $props();
+	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 
 	let colorScheme = $state('light');
 
@@ -74,15 +74,33 @@
 						</li>
 					{/each}
 				</ul>
-				<ul class="navbar-nav d-flex ms-auto">
+				<ul class="navbar-nav ms-auto">
 					<li><hr class="navbar-divider" /></li>
-					<li class="nav-item">
-						<a href="/users/{data.user.id}" class="nav-link text-center text-white">{data.user.name}</a>
-					</li>
+					<li class="nav-item"></li>
+					{#if data.user.picture_url}
+						<li class="nav-item">
+							<a href="/users/{data.user.id}" class="nav-link text-center text-white d-flex justify-content-center align-items-center">
+								{data.user.name}
+								<img
+									src={data.user.picture_url}
+									alt={data.user.name}
+									class="rounded-circle align-self-center ms-2 d-none d-sm-inline-block"
+									width="32"
+									crossorigin="anonymous"
+									referrerpolicy="no-referrer"
+								/>
+							</a>
+						</li>
+					{/if}
 					<li class="nav-item align-self-center">
 						<form action="/auth/?/logout" method="post">
-							<button type="submit" class="btn btn-outline-warning btn-sm" aria-label="Kijelentkezés">
+							<button
+								type="submit"
+								class="btn btn-outline-warning btn-sm"
+								aria-label="Kijelentkezés"
+							>
 								<i class="fa-solid fa-right-from-bracket"></i>
+								<span class="d-inline d-sm-none">Kijelentkezés</span>
 							</button>
 						</form>
 					</li>

@@ -45,10 +45,11 @@ export const GET: RequestHandler = async ({ cookies, url }) => {
 	const googleId = claimsParser.getString('sub');
 	const name = claimsParser.getString('name');
 	const email = claimsParser.getString('email');
+	const picture = claimsParser.getString('picture');
 
 	let user = await getUserByGoogleId(googleId);
 	if (!user) {
-		user = await createUserWithGoogle(googleId, email, name);
+		user = await createUserWithGoogle(googleId, email, name, picture);
 		if (!user) {
 			throw error('Registration error');
 		}
