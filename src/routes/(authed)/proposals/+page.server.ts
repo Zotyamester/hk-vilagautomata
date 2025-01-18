@@ -17,8 +17,8 @@ export const load = (async ({ url }) => {
 			proposer: true,
 			attachments: true
 		},
-		skip: skip,
-		take: limit
+		take: limit,
+		skip: skip
 	});
 
 	return {

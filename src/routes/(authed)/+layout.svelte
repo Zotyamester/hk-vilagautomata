@@ -1,8 +1,9 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
-	import { page } from '$app/state';
+	import { navigating, page } from '$app/state';
 	import { onMount } from 'svelte';
+	import LoadingIndicator from '$lib/components/LoadingIndicator.svelte';
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 
@@ -24,7 +25,6 @@
 	const routes = [
 		{ name: 'Szavazások', path: '/votes' },
 		{ name: 'Előterjesztések', path: '/proposals' },
-		{ name: 'Beszámolók', path: '/reports' },
 		{ name: 'Felhasználók', path: '/users' }
 	];
 
@@ -77,10 +77,13 @@
 				<ul class="navbar-nav ms-auto">
 					<li><hr class="navbar-divider" /></li>
 					<li class="nav-item"></li>
-					{#if data.user.picture_url}
-						<li class="nav-item">
-							<a href="/users/{data.user.id}" class="nav-link text-center text-white d-flex justify-content-center align-items-center">
-								{data.user.name}
+					<li class="nav-item">
+						<a
+							href="/users/{data.user.id}"
+							class="nav-link text-center text-white d-flex justify-content-center align-items-center"
+						>
+							{data.user.name}
+							{#if data.user.picture_url}
 								<img
 									src={data.user.picture_url}
 									alt={data.user.name}
@@ -89,9 +92,9 @@
 									crossorigin="anonymous"
 									referrerpolicy="no-referrer"
 								/>
-							</a>
-						</li>
-					{/if}
+							{/if}
+						</a>
+					</li>
 					<li class="nav-item align-self-center">
 						<form action="/auth/?/logout" method="post">
 							<button
@@ -108,6 +111,12 @@
 			</div>
 		</div>
 	</nav>
+
+	<section id="loadProgress" class="container-fluid">
+		{#if navigating.to}
+			<LoadingIndicator />
+		{/if}
+	</section>
 </header>
 
 <main id="main" class="container mb-4">
@@ -117,7 +126,8 @@
 </main>
 
 <style>
-	main#main {
+	#loadProgress {
 		margin-top: 5rem;
+		margin-bottom: 1rem;
 	}
 </style>
