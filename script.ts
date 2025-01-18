@@ -86,12 +86,40 @@ async function create() {
 	console.log(user);
 }
 
+async function addProposals() {
+	const proposals = await prisma.proposal.createMany({
+		data: [...Array(30).keys()].map((i) => ({
+			title: `Proposal Title ${i}`,
+			author_id: 1,
+			proposer_id: 1,
+			implementer_id: 1,
+			proposition_date: new Date(),
+			agenda_date: new Date(),
+			content: `Proposal content ${i}`,
+			table: `Table ${i}`,
+			proposed_resolution: `Resolution ${i}`,
+			previous_proposals: `Previous proposal ${i}`,
+			yes_votes: 0,
+			no_votes: 0,
+			abstention_votes: 0,
+			invalid_votes: 0,
+			is_accepted: false,
+			is_urgent: true,
+			is_electronic: false,
+			is_double_majority: true,
+			is_hidden: true
+		}))
+	});
+
+	console.log(proposals);
+}
+
 async function getOne(id: number) {
 	const user = await prisma.user.findUnique({
-        where: {
-            id
-        }
-    });
+		where: {
+			id
+		}
+	});
 	console.log(user);
 }
 
@@ -101,7 +129,7 @@ async function getAll() {
 }
 
 async function getAttachmentsForProposalsImplementedByUser(id: number) {
-    const user = await prisma.user.findUnique({
+	const user = await prisma.user.findUnique({
 		where: {
 			id
 		},
@@ -113,13 +141,14 @@ async function getAttachmentsForProposalsImplementedByUser(id: number) {
 			}
 		}
 	});
-	console.log(user.implemented_proposals.map(ip => ip.attachments).flat());
+	console.log(user.implemented_proposals.map((ip) => ip.attachments).flat());
 }
 
 // create()
+addProposals()
 // getOne(1)
 // getAll()
-getAttachmentsForProposalsImplementedByUser(1)
+// getAttachmentsForProposalsImplementedByUser(1)
 	.then(async () => {
 		await prisma.$disconnect();
 	})

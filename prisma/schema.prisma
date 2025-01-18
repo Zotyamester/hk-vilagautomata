@@ -31,7 +31,7 @@ model User {
   authored_proposals    Proposal[] @relation("authored_proposals")
   owned_propposals      Proposal[] @relation("owned_proposals")
   implemented_proposals Proposal[] @relation("implemented_proposals")
-  Session               Session[]
+  sessions              Session[]
 }
 
 enum ProposalType {
