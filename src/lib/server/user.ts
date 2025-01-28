@@ -1,8 +1,5 @@
 import prisma from '$lib/prisma';
-import type { Session, User } from '@prisma/client';
-import type { Cookies } from '@sveltejs/kit';
-import { encodeBase32, encodeHexLowerCase } from '@oslojs/encoding';
-import { sha256 } from '@oslojs/crypto/sha2';
+import type { User } from '@prisma/client';
 
 export async function createUserWithGoogle(
 	google_id: string,
@@ -30,94 +27,55 @@ export async function getUserByGoogleId(google_id: string): Promise<User | null>
 	return user;
 }
 
-export function generateSessionToken(): string {
-	const tokenBytes = new Uint8Array(20);
-	crypto.getRandomValues(tokenBytes);
-	const token = encodeBase32(tokenBytes).toLowerCase();
-	return token;
-}
-
-export async function createSession(token: string, user: User): Promise<Session> {
-	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
-	const session = await prisma.session.create({
-		data: {
-			id: sessionId,
-			userId: user.id,
-			expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14)
-		}
-	});
-	return session;
-}
-
-export async function validateSessionToken(
-	token: string
-): Promise<(Session & { user: User }) | null> {
-	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
-
-	const session = await prisma.session.findUnique({
+export async function updateUser(
+	id: number,
+	name: string | undefined,
+	picture_url: string | undefined,
+	wiki_name: string | undefined,
+	has_mandate: boolean | undefined,
+	is_admin: boolean | undefined,
+	is_active: boolean | undefined
+) {
+	await prisma.user.update({
 		where: {
-			id: sessionId
+			id
 		},
-		include: {
-			user: true
-		}
-	});
-	if (!session) {
-		return null;
-	}
-
-	if (Date.now() >= session.expiresAt.getTime()) {
-		await prisma.session.delete({
-			where: {
-				id: session.id
-			}
-		});
-		return null;
-	}
-
-	if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 24 * 7) {
-		session.expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 14);
-		await prisma.session.update({
-			where: {
-				id: session.id
-			},
-			data: {
-				expiresAt: session.expiresAt
-			}
-		});
-	}
-
-	return session;
-}
-
-export async function invalidateSession(sessionId: string) {
-	await prisma.session.delete({
-		where: {
-			id: sessionId
+		data: {
+			name,
+			picture_url,
+			wiki_name,
+			has_mandate,
+			is_admin,
+			is_active
 		}
 	});
 }
 
-export async function invalidateUserSessions(userId: number) {
-	await prisma.session.deleteMany({
-		where: {
-			userId
-		}
-	});
-}
+export function validateUserUpdate(
+	name: string | undefined,
+	picture_url: string | undefined,
+	wiki_name: string | undefined
+) {
+	const errors: Record<string, string> = {};
 
-export function setSessionTokenCookie(cookies: Cookies, token: string, expiresAt: Date) {
-	cookies.set('session', token, {
-		httpOnly: true,
-		path: '/',
-		secure: import.meta.env.PROD,
-		sameSite: 'lax',
-		expires: expiresAt
-	});
-}
+	if (!name || name.length < 3 || name.length > 50) {
+		errors.name = 'A névnek 3 és 50 karakter között kell lennie';
+	}
+	if (
+		picture_url &&
+		!picture_url.match(
+			/[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/gi
+		)
+	) {
+		errors.profile_url = 'Érvénytelen URL';
+	}
+	if (wiki_name && (wiki_name.length < 3 || wiki_name.length > 50)) {
+		errors.wiki_name = 'A Wiki felhasználónévnek 3 és 50 karakter között kell lennie';
+	}
 
-export function deleteSessionTokenCookie(cookies: Cookies) {
-	cookies.delete('session', {
-		path: '/'
-	});
+	if (Object.keys(errors).length > 0) {
+		return errors;
+	}
+
+	return {};
 }

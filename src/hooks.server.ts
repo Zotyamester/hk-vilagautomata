@@ -1,9 +1,13 @@
-import { deleteSessionTokenCookie, setSessionTokenCookie, validateSessionToken } from '$lib/server/user';
+import {
+	deleteSessionTokenCookie,
+	setSessionTokenCookie,
+	validateSessionToken
+} from '$lib/server/session';
 import { type Handle } from '@sveltejs/kit';
 
-export const handle: Handle = async ({ event, resolve }) => { 
+export const handle: Handle = async ({ event, resolve }) => {
 	console.log(`[DEBUG]: ${event.url}`);
-	
+
 	const token = event.cookies.get('session');
 	if (token) {
 		const session = await validateSessionToken(token);

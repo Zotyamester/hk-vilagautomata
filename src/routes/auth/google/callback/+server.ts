@@ -4,13 +4,9 @@ import { ObjectParser } from '@pilcrowjs/object-parser';
 import { decodeIdToken } from 'arctic';
 
 import type { OAuth2Tokens } from 'arctic';
-import {
-	createSession,
-	createUserWithGoogle,
-	generateSessionToken,
-	getUserByGoogleId,
-	setSessionTokenCookie
-} from '$lib/server/user';
+import { createSession, setSessionTokenCookie } from '$lib/server/session';
+import { createUserWithGoogle, getUserByGoogleId } from '$lib/server/user';
+import { generateSessionToken } from '$lib/server/session';
 import { error } from 'console';
 
 export const GET: RequestHandler = async ({ cookies, url }) => {

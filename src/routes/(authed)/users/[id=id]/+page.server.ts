@@ -1,6 +1,7 @@
 import prisma from '$lib/prisma';
-import { error } from '@sveltejs/kit';
+import { error, fail, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { updateUser, validateUserUpdate } from '$lib/server/user';
 
 export const load = (async ({ params }) => {
 	const editedUser = await prisma.user.findUnique({
@@ -13,6 +14,46 @@ export const load = (async ({ params }) => {
 	}
 
 	return {
-        editedUser
-    };
+		editedUser
+	};
 }) satisfies PageServerLoad;
+
+export const actions = {
+	default: async ({ params, request, locals }) => {
+		const id = parseInt(params.id ?? '');
+		if (locals.session.user.id !== id && !locals.session.user.is_admin) {
+			return fail(403, {
+				error: 'Nincs jogosultságod ehhez a művelethez'
+			});
+		}
+
+		const data = await request.formData();
+
+		const name = String(data.get('name'));
+		const picture_url = String(data.get('pictureUrl'));
+		const wiki_name = String(data.get('wikiName'));
+		const has_mandate =
+			data.get('hasMandate') === undefined ? undefined : data.get('hasMandate') === 'on';
+		const is_admin = data.get('isAdmin') === undefined ? undefined : data.get('isAdmin') === 'on';
+		const is_active =
+			data.get('isActive') === undefined ? undefined : data.get('isActive') === 'on';
+
+		// Privilege check
+		if (
+			!locals.session.user.is_admin &&
+			(has_mandate !== undefined || is_admin !== undefined || is_active !== undefined)
+		) {
+			return fail(403, {
+				error: 'Nincs jogosultságod ehhez a művelethez'
+			});
+		}
+
+		const errors = validateUserUpdate(name, picture_url, wiki_name);
+		if (Object.keys(errors).length > 0) {
+			console.log('fail');
+			return fail(400, errors);
+		}
+
+		await updateUser(id, name, picture_url, wiki_name, has_mandate, is_admin, is_active);
+	}
+} satisfies Actions;

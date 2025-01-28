@@ -4,10 +4,10 @@ import prisma from '$lib/prisma';
 import {
 	createSession,
 	deleteSessionTokenCookie,
-	generateSessionToken,
 	invalidateSession,
 	setSessionTokenCookie
-} from '$lib/server/user';
+} from '$lib/server/session';
+import { generateSessionToken } from '$lib/server/session';
 
 export const load = (async ({ locals, url }) => {
 	const redirectTo = url.searchParams.get('redirectTo');

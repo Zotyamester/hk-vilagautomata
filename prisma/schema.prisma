@@ -87,26 +87,6 @@ model Attachment {
   is_hidden Boolean
 }
 
-// model BeszamoloGroup {
-//   id             Int              @id @default(autoincrement())
-//   first_day      Int
-//   last_day       Int
-//   year           Int
-//   month          Int
-//   path           String
-//   hidden         Int
-//   BeszamoloMoney BeszamoloMoney[]
-// }
-
-// model BeszamoloMoney {
-//   id                 Int            @id @default(autoincrement())
-//   wiki_name          String
-//   money              Int
-//   point              Int
-//   beszamolo_group_id Int
-//   BeszamoloGroup     BeszamoloGroup @relation(fields: [beszamolo_group_id], references: [id])
-// }
-
 // model Vote {
 //   id               Int             @id @default(autoincrement())
 //   available_date   String
