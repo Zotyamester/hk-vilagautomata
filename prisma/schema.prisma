@@ -32,6 +32,7 @@ model User {
   owned_propposals      Proposal[] @relation("owned_proposals")
   implemented_proposals Proposal[] @relation("implemented_proposals")
   sessions              Session[]
+  Vote                  Vote[]
 }
 
 enum ProposalType {
@@ -87,49 +88,53 @@ model Attachment {
   is_hidden Boolean
 }
 
-// model Vote {
-//   id               Int             @id @default(autoincrement())
-//   available_date   String
-//   end_date         String
-//   hidden           Int
-//   mandate_only     Int
-//   public_vote      Int
-//   eloterjesztes_id Int
-//   question         String
-//   created_by       Int
-//   maximum_votes    Int
-//   closed           Int
-//   one_choice_only  Int
-//   VoteCandidates   VoteCandidate[]
-//   UserVotes        UserVote[]
-//   CastedVotes      CastedVote[]
-// }
+model Vote {
+  id Int @id @default(autoincrement())
 
-// model VoteCandidate {
-//   id          Int          @id @default(autoincrement())
-//   name        String
-//   vote_id     Int
-//   Vote        Vote         @relation(fields: [vote_id], references: [id])
-//   CastedVotes CastedVote[]
-//   UserVote    UserVote[]
-// }
+  author_id Int
+  author    User @relation(fields: [author_id], references: [id])
 
-// model UserVote {
-//   id                Int           @id @default(autoincrement())
-//   user_id           Int
-//   vote_id           Int
-//   vote_candidate_id Int
-//   Vote              Vote          @relation(fields: [vote_id], references: [id])
-//   VoteCandidate     VoteCandidate @relation(fields: [vote_candidate_id], references: [id])
-// }
+  available_date DateTime
+  end_date       DateTime
 
-// model CastedVote {
-//   id                Int           @id @default(autoincrement())
-//   vote              String
-//   vote_candidate_id Int
-//   vote_id           Int
-//   casted_by         Int
-//   casted_by_hash    String
-//   Vote              Vote          @relation(fields: [vote_id], references: [id])
-//   VoteCandidate     VoteCandidate @relation(fields: [vote_candidate_id], references: [id])
-// }
+  is_hidden       Boolean
+  is_mandate_only Boolean
+  is_public_vote  Boolean
+
+  question        String
+  maximum_votes   Int
+  closed          Int
+  one_choice_only Int
+  VoteCandidates  VoteCandidate[]
+  UserVotes       UserVote[]
+  CastedVotes     CastedVote[]
+}
+
+model VoteCandidate {
+  id          Int          @id @default(autoincrement())
+  name        String
+  vote_id     Int
+  Vote        Vote         @relation(fields: [vote_id], references: [id])
+  CastedVotes CastedVote[]
+  UserVote    UserVote[]
+}
+
+model UserVote {
+  id                Int           @id @default(autoincrement())
+  user_id           Int
+  vote_id           Int
+  vote_candidate_id Int
+  Vote              Vote          @relation(fields: [vote_id], references: [id])
+  VoteCandidate     VoteCandidate @relation(fields: [vote_candidate_id], references: [id])
+}
+
+model CastedVote {
+  id                Int           @id @default(autoincrement())
+  vote              String
+  vote_candidate_id Int
+  vote_id           Int
+  casted_by         Int
+  casted_by_hash    String
+  Vote              Vote          @relation(fields: [vote_id], references: [id])
+  VoteCandidate     VoteCandidate @relation(fields: [vote_candidate_id], references: [id])
+}
