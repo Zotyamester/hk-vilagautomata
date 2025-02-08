@@ -1,10 +1,11 @@
 <script lang="ts">
-    import type { Snippet } from 'svelte';
-	import { onMount } from 'svelte';
+	import type { Snippet } from 'svelte';
+	import { onMount, setContext } from 'svelte';
 
-    let { children }: {  children: Snippet } = $props();
+	let { children }: { children: Snippet } = $props();
 
 	let colorScheme = $state('light');
+	setContext('colorScheme', () => colorScheme);
 
 	function adjustColorScheme(darkModePreferenceMatch: boolean) {
 		colorScheme = darkModePreferenceMatch ? 'dark' : 'light';
@@ -21,19 +22,17 @@
 </script>
 
 <svelte:head>
-	<title>
-		Világautomata
-	</title>
+	<title>Világautomata</title>
 </svelte:head>
 
 <main id="main" class="container">
-    <section class="text-center my-4">
-        {#if colorScheme === 'light'}
-            <img src="/hk-light-mode.svg" class="img-fluid" alt="vik.hk" width="128" />
-        {:else}
-            <img src="/hk-dark-mode.svg" class="img-fluid" alt="vik.hk" width="128" />
-        {/if}
-    </section>
-    
-    {@render children()}
+	<section class="text-center my-4">
+		{#if colorScheme === 'light'}
+			<img src="/hk-light-mode.svg" class="img-fluid" alt="vik.hk" width="128" />
+		{:else}
+			<img src="/hk-dark-mode.svg" class="img-fluid" alt="vik.hk" width="128" />
+		{/if}
+	</section>
+
+	{@render children()}
 </main>
