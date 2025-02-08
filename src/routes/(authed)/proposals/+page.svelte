@@ -1,9 +1,16 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
 	import FileRef from '$lib/components/FileRef.svelte';
 	import Pagination from '$lib/components/Pagination.svelte';
+	import { injectOrderingParams } from '$lib/ordering';
+	import { refreshPaginationParams } from '$lib/pagination';
+	import { debounce, extractQueryParameters, injectQueryParameters } from '$lib/query';
 
 	let { data } = $props();
+
+	let query = $state(extractQueryParameters(page.url.searchParams));
 </script>
 
 <article>
@@ -35,10 +42,20 @@
 						placeholder="Keresés"
 						aria-label="Keresés"
 						aria-describedby="searchBar"
+						bind:value={query}
+						onkeyup={debounce(() => {
+							goto(`?${injectQueryParameters(page.url.searchParams, query, true)}`);
+						})}
+						autofocus
 					/>
-					<button class="btn btn-primary" type="button" aria-label="Frissítés">
+					<a
+						href="?{refreshPaginationParams(page.url.searchParams)}"
+						class="btn btn-primary"
+						onclick={() => invalidateAll()}
+						aria-label="Frissítés"
+					>
 						<i class="fa-solid fa-arrows-rotate"></i>
-					</button>
+					</a>
 					<button
 						class="btn btn-primary dropdown-toggle"
 						type="button"
@@ -49,11 +66,48 @@
 						<i class="fa-solid fa-list"></i>
 					</button>
 					<ul class="dropdown-menu dropdown-menu-end">
-						<li><button type="button" class="dropdown-item">Előterjesztés dátuma</button></li>
-						<li><button type="button" class="dropdown-item">Cím</button></li>
-						<li><button type="button" class="dropdown-item">Előterjesztő</button></li>
-						<li><button type="button" class="dropdown-item">Végrehajtásért felelős</button></li>
-						<li><button type="button" class="dropdown-item">Ülés dátuma</button></li>
+						<li>
+							<a
+								href="?{injectOrderingParams(
+									page.url.searchParams,
+									'proposition_date',
+									true
+								).toString()}"
+								class="dropdown-item">Előterjesztés dátuma</a
+							>
+						</li>
+						<li>
+							<a
+								href="?{injectOrderingParams(page.url.searchParams, 'title', true).toString()}"
+								class="dropdown-item">Cím</a
+							>
+						</li>
+						<li>
+							<a
+								href="?{injectOrderingParams(page.url.searchParams, 'proposer', true).toString()}"
+								class="dropdown-item">Előterjesztő</a
+							>
+						</li>
+						<li>
+							<a
+								href="?{injectOrderingParams(
+									page.url.searchParams,
+									'implementer',
+									true
+								).toString()}"
+								class="dropdown-item">Végrehajtásért felelős</a
+							>
+						</li>
+						<li>
+							<a
+								href="?{injectOrderingParams(
+									page.url.searchParams,
+									'agenda_date',
+									true
+								).toString()}"
+								class="dropdown-item">Ülés dátuma</a
+							>
+						</li>
 					</ul>
 				</div>
 			</div>
@@ -107,6 +161,7 @@
 										class="btn-group"
 										role="group"
 										aria-label="Műveletek"
+										use:enhance
 									>
 										<a
 											href="/proposals/{proposal.id}"
