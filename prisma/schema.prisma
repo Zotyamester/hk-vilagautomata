@@ -9,7 +9,7 @@ datasource db {
 
 model Session {
   id        String   @id
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId    Int
   expiresAt DateTime
 }
@@ -47,13 +47,13 @@ model Proposal {
   title String
 
   author_id Int
-  author    User @relation(name: "authored_proposals", fields: [author_id], references: [id]) // TODO: Should we keep the proposals of users who have been deleted? If yes, the author should be nullable.
+  author    User @relation(name: "authored_proposals", fields: [author_id], references: [id], onDelete: Cascade, onUpdate: Cascade) // TODO: Should we keep the proposals of users who have been deleted? If yes, the author should be nullable.
 
   proposer_id Int
-  proposer    User @relation(name: "owned_proposals", fields: [proposer_id], references: [id])
+  proposer    User @relation(name: "owned_proposals", fields: [proposer_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   implementer_id Int
-  implementer    User @relation(name: "implemented_proposals", fields: [implementer_id], references: [id])
+  implementer    User @relation(name: "implemented_proposals", fields: [implementer_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   proposition_date DateTime @default(now())
   agenda_date      DateTime @default(now())
@@ -81,7 +81,7 @@ model Attachment {
   id Int @id @default(autoincrement())
 
   proposal_id Int
-  proposal    Proposal @relation(fields: [proposal_id], references: [id])
+  proposal    Proposal @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   file_path String
   file_name String
@@ -92,7 +92,7 @@ model Vote {
   id Int @id @default(autoincrement())
 
   author_id Int
-  author    User @relation(fields: [author_id], references: [id])
+  author    User @relation(fields: [author_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   available_date DateTime
   end_date       DateTime
@@ -114,7 +114,7 @@ model VoteCandidate {
   id          Int          @id @default(autoincrement())
   name        String
   vote_id     Int
-  Vote        Vote         @relation(fields: [vote_id], references: [id])
+  Vote        Vote         @relation(fields: [vote_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   CastedVotes CastedVote[]
   UserVote    UserVote[]
 }
@@ -124,8 +124,8 @@ model UserVote {
   user_id           Int
   vote_id           Int
   vote_candidate_id Int
-  Vote              Vote          @relation(fields: [vote_id], references: [id])
-  VoteCandidate     VoteCandidate @relation(fields: [vote_candidate_id], references: [id])
+  Vote              Vote          @relation(fields: [vote_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  VoteCandidate     VoteCandidate @relation(fields: [vote_candidate_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model CastedVote {
@@ -135,6 +135,6 @@ model CastedVote {
   vote_id           Int
   casted_by         Int
   casted_by_hash    String
-  Vote              Vote          @relation(fields: [vote_id], references: [id])
-  VoteCandidate     VoteCandidate @relation(fields: [vote_candidate_id], references: [id])
+  Vote              Vote          @relation(fields: [vote_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  VoteCandidate     VoteCandidate @relation(fields: [vote_candidate_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
