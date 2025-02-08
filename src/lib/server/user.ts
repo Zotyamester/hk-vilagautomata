@@ -51,6 +51,15 @@ export async function updateUser(
 	});
 }
 
+function isValidURL(url: string): boolean {
+	try {
+		new URL(url);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
 export function validateUserUpdate(
 	name: string | undefined,
 	picture_url: string | undefined,
@@ -61,12 +70,7 @@ export function validateUserUpdate(
 	if (!name || name.length < 3 || name.length > 50) {
 		errors.name = 'A névnek 3 és 50 karakter között kell lennie';
 	}
-	if (
-		picture_url &&
-		!picture_url.match(
-			/[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/gi
-		)
-	) {
+	if (picture_url && !isValidURL(picture_url)) {
 		errors.profile_url = 'Érvénytelen URL';
 	}
 	if (wiki_name && (wiki_name.length < 3 || wiki_name.length > 50)) {

@@ -4,6 +4,7 @@
 	import { navigating, page } from '$app/state';
 	import { onMount } from 'svelte';
 	import LoadingIndicator from '$lib/components/LoadingIndicator.svelte';
+	import { enhance } from '$app/forms';
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 
@@ -96,7 +97,7 @@
 						</a>
 					</li>
 					<li class="nav-item align-self-center">
-						<form action="/auth/?/logout" method="post">
+						<form action="/auth/?/logout" method="post" use:enhance>
 							<button
 								type="submit"
 								class="btn btn-outline-warning btn-sm"
