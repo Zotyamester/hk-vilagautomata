@@ -70,11 +70,10 @@ model Proposal {
   abstention_votes Int
   invalid_votes    Int
 
-  is_accepted        Boolean
-  is_urgent          Boolean
-  is_electronic      Boolean
-  is_double_majority Boolean
-  is_hidden          Boolean
+  is_accepted   Boolean
+  is_urgent     Boolean
+  is_electronic Boolean
+  is_hidden     Boolean
 }
 
 model Attachment {
@@ -97,17 +96,15 @@ model Vote {
   available_date DateTime
   end_date       DateTime
 
-  is_hidden       Boolean
   is_mandate_only Boolean
   is_public_vote  Boolean
 
-  question        String
-  maximum_votes   Int
-  closed          Int
-  one_choice_only Int
-  VoteCandidates  VoteCandidate[]
-  UserVotes       UserVote[]
-  CastedVotes     CastedVote[]
+  question       String
+  maximum_votes  Int
+  is_closed      Boolean
+  VoteCandidates VoteCandidate[]
+  UserVotes      UserVote[]
+  CastedVotes    CastedVote[]
 }
 
 model VoteCandidate {
