@@ -2,26 +2,11 @@
 	import type { Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
 	import { navigating, page } from '$app/state';
-	import { onMount } from 'svelte';
 	import LoadingIndicator from '$lib/components/LoadingIndicator.svelte';
 	import { enhance } from '$app/forms';
+	import { theme } from '$lib/theme';
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
-
-	let colorScheme = $state('light');
-
-	function adjustColorScheme(darkModePreferenceMatch: boolean) {
-		colorScheme = darkModePreferenceMatch ? 'dark' : 'light';
-		document.documentElement.setAttribute('data-bs-theme', colorScheme);
-	}
-
-	onMount(() => {
-		adjustColorScheme(window.matchMedia('(prefers-color-scheme: dark)').matches);
-
-		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
-			adjustColorScheme(event.matches);
-		});
-	});
 
 	const routes = [
 		{ name: 'Szavazások', path: '/votes' },
@@ -44,7 +29,7 @@
 	<nav class="navbar navbar-expand-sm fixed-top bg-body-tertiary">
 		<div class="container-fluid">
 			<a href="/" class="navbar-brand">
-				{#if colorScheme === 'light'}
+				{#if $theme.colorScheme === 'light'}
 					<img src="/hk-light-mode.svg" alt="vik.hk" width="32" />
 				{:else}
 					<img src="/hk-dark-mode.svg" alt="vik.hk" width="32" />
@@ -81,7 +66,7 @@
 					<li class="nav-item">
 						<a
 							href="/users/{data.user.id}"
-							class="nav-link text-center text-white d-flex justify-content-center align-items-center"
+							class="nav-link text-center text-{$theme.invertedColorScheme} d-flex justify-content-center align-items-center"
 						>
 							{data.user.name}
 							{#if data.user.picture_url}

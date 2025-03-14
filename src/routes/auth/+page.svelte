@@ -1,11 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { getContext } from 'svelte';
-
-	let { data } = $props();
-
-	let colorScheme = $derived(getContext('colorScheme')());
-	let invertedColorScheme = $derived(colorScheme === 'dark' ? 'light' : 'dark');
+	import { theme } from '$lib/theme';
 </script>
 
 <div class="row my-1">
@@ -17,11 +12,11 @@
 </div>
 
 <div class="row">
-	<a href="/auth/google" class="btn btn btn-outline-{invertedColorScheme} my-1">
+	<a href="/auth/google" class="btn btn btn-outline-{$theme.invertedColorScheme} my-1">
 		<img src="/google-color.svg" alt="Google Logo" width="32" class="me-2" />
 		<span>Folytatás Google-fiókkal</span>
 	</a>
-	<a href="/auth/microsoft" class="btn btn btn-outline-{invertedColorScheme} my-1">
+	<a href="/auth/microsoft" class="btn btn btn-outline-{$theme.invertedColorScheme} my-1">
 		<img src="/microsoft-color.svg" alt="Microsoft Logo" width="32" class="me-2" />
 		<span>Folytatás Microsoft-fiókkal</span>
 	</a>
